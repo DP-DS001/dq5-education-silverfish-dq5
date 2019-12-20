@@ -56,8 +56,39 @@ acs_marital_group$county_code <- as.numeric(acs_marital_group$county_code)
 crosswalk <- read_excel('data/data_district_to_county_crosswalk.xls')
 names(crosswalk) <- c("county_number", "county_name", "district_number")
 
+# Dataset for graduation rates
+graduation <- read_csv('data/data_2015_District-Attendance-and-Graduation.csv')
+names(graduation) <- c("school_year",
+                       "district",
+                       "district_name",
+                       "k_8_attendance_rate_pct",
+                       "k_8_promotion_rate_pct",
+                       "state_goal_attendance_rate",
+                       "state_goal_promotion_rate",
+                       "attendance_rate_pct",
+                       "cohort_dropout_pct",
+                       "graduation_rate_nclb_pct",
+                       "event_dropout_pct",
+                       "all_grad_rate",
+                       "white_grad_rate",
+                       "african_american_grad_rate",
+                       "hispanic_grad_rate",
+                       "asian_grad_rate",
+                       "native_american_grad_rate",
+                       "hawaiian_pacisld_grad_rate",
+                       "male_grad_rate",
+                       "female_grad_rate",
+                       "economically_disadvantaged_grad_rate",
+                       "students_with_disabilities_grad_rate",
+                       "limited_english_proficient_grad_rate")
+
+# Create combined dataset.
 tn_socioeconomics <- crosswalk %>%
                         inner_join(tvaas, by = "district_number") %>%
                         inner_join(districts, by = c("district_number" = "system")) %>%
                         inner_join(saipe, by = c("county_number" = "county_code")) %>%
-                        inner_join(acs_marital_group, by = c("county_number" = "county_code"))
+                        inner_join(acs_marital_group, by = c("county_number" = "county_code")) %>%
+                        inner_join(graduation, by = c("district_number" = "district"))
+
+# Write CSV
+write.csv(tn_socioeconomics, file = "data/tn_socioeconomics.csv",row.names=FALSE)
